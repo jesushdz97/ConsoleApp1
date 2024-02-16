@@ -1,116 +1,97 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
-using static System.Net.Mime.MediaTypeNames;
+﻿using System.Data.SqlClient;
 
 namespace ConsoleApp1.Models
 {
-    internal class DamageDB
+    internal class DamageDb
     {
-        private readonly string _host = "192.168.54.170";
-        private readonly string _database = "BdIncidentTest";
-        private readonly string _user = "sa";
-        private readonly string _password = "f4d#he78!";
-        private readonly string _connectionString;
-        private readonly string _table = "Damages";
-
-        public DamageDB() 
-        {
-            this._connectionString= "Data Source=" + this._host + ";" + "Initial Catalog=" + this._database + ";" + "User=" + this._user + ";" + "Password=" + this._password + "";
-        }
+        private const string Host = "192.168.54.170";
+        private const string Database = "BdIncidentTest";
+        private const string User = "sa";
+        private const string Password = "f4d#he78!";
+        private const string ConnectionString = "Data Source=" + Host + ";" + "Initial Catalog=" + Database + ";" + "User=" + User + ";" + "Password=" + Password + "";
+        private const string Table = "Damages";
 
         public List<Damage> Get()
         {
-            List<Damage> result = new List<Damage>();
-            string query = "SELECT * FROM " + this._table;
+            var result = new List<Damage>();
+            const string query = "SELECT * FROM " + Table;
 
-            using (SqlConnection connection = new SqlConnection(this._connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection); 
+            using var connection = new SqlConnection(ConnectionString);
+            var command = new SqlCommand(query, connection); 
 
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
+            connection.Open();
+            var reader = command.ExecuteReader();
 
-                while (reader.Read()) {
-                    int DamagesId = reader.GetInt32(0);
-                    string Description = reader.GetString(1);
+            while (reader.Read()) {
+                var damagesId = reader.GetInt32(0);
+                var description = reader.GetString(1);
 
-                    Damage damage = new Damage(DamagesId, Description);
-                    result.Add(damage);
-                }
-
-                reader.Close();
-                connection.Close();
+                var damage = new Damage(damagesId, description);
+                result.Add(damage);
             }
-       
+
+            reader.Close();
+            connection.Close();
+
             return result;
         }
 
         public void Create(Damage damage) {
-            string query = "INSERT INTO " + this._table + " VALUES (@description)";
+            const string query = "INSERT INTO " + Table + " VALUES (@description)";
 
 
-            using (SqlConnection connection = new SqlConnection(this._connectionString))
+            using var connection = new SqlConnection(ConnectionString);
+            try
             {
-                try
-                {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@description", damage.Description);
+                var command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@description", damage.Description);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
-                }
-                catch 
-                {
-                    connection.Close();
-                }
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+            catch 
+            {
+                connection.Close();
             }
         }
 
         public void Update(Damage damage, int damageId) {
-            string query = "UPDATE "+this._table+ " SET Description=@description WHERE DamagesId=@id";
+            const string query = "UPDATE " + Table + " SET Description=@description WHERE DamagesId=@id";
 
-            using (SqlConnection connection = new SqlConnection(this._connectionString))
+            using var connection = new SqlConnection(ConnectionString);
+            try
             {
-                try
-                {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@description", damage.Description);
-                    command.Parameters.AddWithValue("@id", damageId);
+                var command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@description", damage.Description);
+                command.Parameters.AddWithValue("@id", damageId);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
-                }
-                catch
-                {
-                    connection.Close();
-                }
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+            catch
+            {
+                connection.Close();
             }
         }
 
         public void Delete(int damageId) {
-            string query = "DELETE FROM " + this._table + " WHERE DamagesId=@id";
+            const string query = "DELETE FROM " + Table + " WHERE DamagesId=@id";
 
-            using (SqlConnection connection = new SqlConnection(this._connectionString))
+            using var connection = new SqlConnection(ConnectionString);
+            try
             {
-                try
-                {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@id", damageId);
+                var command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@id", damageId);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
-                }
-                catch
-                {
-                    connection.Close();
-                }
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+            catch
+            {
+                connection.Close();
             }
         }
     }
