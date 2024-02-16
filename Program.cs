@@ -6,16 +6,27 @@ namespace ConsoleApp1
     {
         private static void Main()
         {
-            try
+            var beers = new List<EvilBeer>()
             {
-                var searcherBeer = new SearcherBeer();
-                var alcohol = searcherBeer.GetAlcohol("Corona");
-                Console.WriteLine(alcohol);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+                new() {Alcohol = 10, Name = "BBC"},
+                new() {Alcohol = 15, Name = "Heineken"},
+                new() {Alcohol = 7,  Name = "Brave"},
+                new() {Alcohol = 5,  Name = "Budweiser"},
+            };
+
+            ShowBeerThatIGetDrunk(beers, beer => beer.Alcohol > 6);
         }
+
+        static void ShowBeerThatIGetDrunk(List<EvilBeer> beers, Predicate<EvilBeer> predicate)
+        {
+            var evilBeer = beers.FindAll(predicate);
+            evilBeer.ForEach(beer => Console.WriteLine(beer.Name));
+        }
+    }
+
+    internal class EvilBeer
+    {
+        public string Name { get; set; }
+        public int Alcohol { get; set; }
     }
 }
